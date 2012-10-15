@@ -1,0 +1,70 @@
+= Translatable
+
+Make attributes of an ActiveRecord Model translatable
+
+== Usage
+
+class MyModel < ActiveRecord::Base
+  include Translatable
+  translate :title
+end
+
+I18n.locale = :en
+mymodel = MyModel.create(title: "My title", title_de: "Mein Title)
+mymodel.title_wk = "Woohhaakkk"
+
+mymodel.title # => "My title"
+mymodel.title_en # => "My title"
+
+== Prerequisites
+To save the locales Translatable saves an array of the specified locale, for
+this to work, the database needs the ability to save arrays. The easiest way to
+handle this in postgres is via the postgres array
+
+gem 'activerecord-postgres-array'
+
+To add the array to the model the migration looks like this
+
+class CreateMyModel < ActiveRecord::Migration
+  def change
+    create_table :my_model do |t|
+      t.string_array :locales
+    end
+  end
+end
+
+== How it works
+
+Translateable saves the translation via I18n.backend.store_translations, this 
+means that the backend has to be able to store new items. So backend needs to 
+be for example the KeyValue or ActiveRecord one. 
+More http://railscasts.com/episodes/256-i18n-backends
+
+== Miscellaneous
+
+=== Tests
+The tests are using rspec, and there is a dummy app setup in the spec directory.
+Since the example is using postgres, to get the tests working there needs to be
+a setup postgres user with the needed rights.
+
+  $ createuser -h localhost
+  Enter name of role to add: translatable 
+  Shall the new role be a superuser? (y/n) n
+  Shall the new role be allowed to create databases? (y/n) y
+  Shall the new role be allowed to create more new roles? (y/n) n
+
+Afterwards the db needs to be setup
+
+  $ cd spec/dummy
+  $ rake db:create
+  $ rake db:migrate
+  $ rake db:test:prepare
+
+Now the test can be run via
+  
+  $ rspec 
+
+=== Current State
+The gem is still in early development and has just been extracted from a
+project. So any bug reports and contributions are highly welcome.
+
