@@ -1,6 +1,8 @@
 = Translatable
 
-Make attributes of an ActiveRecord Model translatable
+Make attributes of an ActiveRecord Model translatable, and store the
+translations in the provided I18n backend.  This is really helpful if there
+already is, a interface to provide ie missing translations for elements in I18n. 
 
 == Usage
 
@@ -15,6 +17,7 @@ mymodel.title_wk = "Woohhaakkk"
 
 mymodel.title # => "My title"
 mymodel.title_en # => "My title"
+mymodel.title_wk # => "Woohhaakkk"
 
 == Prerequisites
 To save the locales Translatable saves an array of the specified locale, for

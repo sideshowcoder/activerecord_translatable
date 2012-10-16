@@ -24,9 +24,7 @@ end
 Bundler::GemHelper.install_tasks
 
 desc 'Default: run the specs'
-task :default => 'spec:unit' do
-  system("bundle exec rspec")
-end
+task :default => 'spec:unit' 
 
 namespace :spec do
   desc "Run unit specs"
@@ -35,6 +33,6 @@ namespace :spec do
   end
 end
 
-desc "Run the unit and acceptance specs"
+desc "Run the unit specs"
 task :spec => ['spec:unit']
 
