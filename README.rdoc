@@ -1,4 +1,4 @@
-= Translatable
+= ActiveRecordTranslatable
 
 Make attributes of an ActiveRecord Model translatable, and store the
 translations in the provided I18n backend.  This is really helpful if there
@@ -7,7 +7,7 @@ already is, a interface to provide ie missing translations for elements in I18n.
 == Usage
 
 class MyModel < ActiveRecord::Base
-  include Translatable
+  include ActiveRecordTranslatable
   translate :title
 end
 
@@ -20,7 +20,7 @@ mymodel.title_en # => "My title"
 mymodel.title_wk # => "Woohhaakkk"
 
 == Prerequisites
-To save the locales Translatable saves an array of the specified locale, for
+To save the locales ActiveRecordTranslatable saves an array of the specified locale, for
 this to work, the database needs the ability to save arrays. The easiest way to
 handle this in postgres is via the postgres array
 
