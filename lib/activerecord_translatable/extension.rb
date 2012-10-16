@@ -1,4 +1,4 @@
-module Translatable
+module ActiveRecordTranslatable
   extend ActiveSupport::Concern
 
   attr_accessor :translations

@@ -9,7 +9,7 @@ require "sprockets/railtie"
 require "activerecord-postgres-array"
 
 Bundler.require
-require "translatable"
+require "activerecord_translatable"
 
 module Dummy
   class Application < Rails::Application

@@ -1,14 +1,14 @@
 $:.push File.expand_path("../lib", __FILE__)
 
-require "translatable"
+require "activerecord_translatable"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "translatable"
-  s.version     = Translatable::VERSION
+  s.name        = "activerecord_translatable"
+  s.version     = ActiveRecordTranslatable::VERSION
   s.authors     = ["Philipp Fehre"]
   s.email       = ["philipp.fehre@gmail.com"]
-  s.homepage    = "http://github.com/sideshowcoder/translatable"
+  s.homepage    = "http://github.com/sideshowcoder/activerecord_translatable"
   s.summary     = "make attributes of active record translatable via the normal i18n backend"
   s.description = "translatable activerecord attributes"
 

@@ -1,8 +1,8 @@
 require "active_record"
 require "active_support/concern"
-require "translatable/extension"
+require "activerecord_translatable/extension"
 
-module Translatable
+module ActiveRecordTranslatable
 
   VERSION = "0.0.1"
 

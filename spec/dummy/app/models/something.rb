@@ -1,5 +1,5 @@
 class Something < ActiveRecord::Base
-  include Translatable
+  include ActiveRecordTranslatable
 
   translate :name
 end

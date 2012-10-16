@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Translateable" do
+describe "ActiveRecordTranslateable" do
 
     it "should add name to translateable" do
       Something.translateable.should include(:name)
