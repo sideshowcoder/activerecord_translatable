@@ -1,3 +1,4 @@
+require "active_record"
 require "active_support/concern"
 require "translatable/extension"
 
