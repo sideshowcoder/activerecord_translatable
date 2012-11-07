@@ -46,6 +46,11 @@ describe "ActiveRecordTranslateable" do
         @something.write_translations
       end
 
+      it "should save the model without translations" do
+        something = Something.new
+        something.save.should be_true
+      end
+
     end
 
     context "custom created methods" do

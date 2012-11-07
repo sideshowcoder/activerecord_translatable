@@ -31,6 +31,8 @@ module ActiveRecordTranslatable
   end
   
   def write_translations
+    return if @translations.nil? # there are no translations to be saved
+
     @translations.each do |locale, translations|
       translations.each do |attribute, value|
         I18n.backend.store_translations(locale, { "#{self.base_name}.#{attribute}-#{self.id}" => value }, escape: false)
