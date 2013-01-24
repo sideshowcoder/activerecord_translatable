@@ -6,6 +6,17 @@ describe "ActiveRecordTranslateable" do
       Something.translateable.should include(:name)
     end
 
+    context "class without translations" do
+      it "should save" do
+        foo = Foo.new
+        foo.save.should be_true
+      end
+      it "should load" do
+        foo = Foo.create!
+        Foo.find(foo.id).should_not be_nil
+      end
+    end
+
     context "translations" do
       before(:each) do
         @something = Something.create!(name: "Something")
@@ -37,7 +48,7 @@ describe "ActiveRecordTranslateable" do
         @something.set_translation("name", "Etwas")
         @something.translation("name", :de).should == "Etwas"
       end
-    
+
       it "should write the stored translations to the backend" do
         backend = double("Backend")
         I18n.stub(:backend).and_return(backend)
@@ -80,7 +91,7 @@ describe "ActiveRecordTranslateable" do
         something.name_de = "Etwas"
         something.available_locales.should include(:en, :de)
       end
-      
+
     end
 
 end

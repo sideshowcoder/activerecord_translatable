@@ -11,7 +11,12 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121015083259) do
+ActiveRecord::Schema.define(:version => 20130124094113) do
+
+  create_table "foos", :force => true do |t|
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "somethings", :force => true do |t|
     t.string_array "locales",    :limit => 255
