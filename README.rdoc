@@ -2,12 +2,11 @@
 
 Make attributes of an ActiveRecord Model translatable, and store the
 translations in the provided I18n backend.  This is really helpful if there
-already is, a interface to provide ie missing translations for elements in I18n. 
+already is, a interface to provide ie missing translations for elements in I18n.
 
 == Usage
 
 class MyModel < ActiveRecord::Base
-  include ActiveRecordTranslatable
   translate :title
 end
 
@@ -38,9 +37,9 @@ end
 
 == How it works
 
-Translateable saves the translation via I18n.backend.store_translations, this 
-means that the backend has to be able to store new items. So backend needs to 
-be for example the KeyValue or ActiveRecord one. 
+Translateable saves the translation via I18n.backend.store_translations, this
+means that the backend has to be able to store new items. So backend needs to
+be for example the KeyValue or ActiveRecord one.
 More http://railscasts.com/episodes/256-i18n-backends
 
 == Miscellaneous
@@ -51,7 +50,7 @@ Since the example is using postgres, to get the tests working there needs to be
 a setup postgres user with the needed rights.
 
   $ createuser -h localhost
-  Enter name of role to add: translatable 
+  Enter name of role to add: translatable
   Shall the new role be a superuser? (y/n) n
   Shall the new role be allowed to create databases? (y/n) y
   Shall the new role be allowed to create more new roles? (y/n) n
@@ -64,8 +63,8 @@ Afterwards the db needs to be setup
   $ rake db:test:prepare
 
 Now the test can be run via
-  
-  $ rspec 
+
+  $ rspec
 
 === Current State
 The gem is still in early development and has just been extracted from a
