@@ -3,24 +3,23 @@ module ActiveRecordTranslatable
 
   attr_accessor :translations
 
-  def setup_locale(locale)
-    locales = self.locales || []
-    locales << locale.to_s
-    self.locales = locales.uniq
-    @translations ||= {}
-    @translations[locale] ||= {}
-  end
-
-  def base_name
-    self.class.name.downcase
-  end
-
   def translatable
     self._translatable[base_name]
   end
 
   def available_locales
     self.locales.map { |locale| locale.to_sym }
+  end
+
+  def setup_locale(locale)
+    locales = self.locales || []
+    locales << locale.to_s
+    self.locales = locales.uniq
+    @translations ||= Hash.new { |h,k| h[k] = {} }
+  end
+
+  def base_name
+    self.class.name.downcase
   end
 
   def translation(attribute, locale = I18n.locale)
@@ -86,17 +85,18 @@ module ActiveRecordTranslatable
   end
 
   module ClassMethods
+    def translate(*attributes)
+      self._translatable ||= Hash.new { |h,k| h[k] = [] }
+      self._translatable[base_name] = translatable.concat(attributes)
+    end
+
     def translatable
       self._translatable[base_name] ||= []
     end
 
+    private
     def base_name
       self.name.downcase
-    end
-
-    def translate(*attributes)
-      self._translatable ||= Hash.new { |h,k| h[k] = [] }
-      self._translatable[base_name] = translatable.concat(attributes)
     end
   end
 
