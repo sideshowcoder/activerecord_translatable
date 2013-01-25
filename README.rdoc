@@ -36,6 +36,24 @@ class CreateMyModel < ActiveRecord::Migration
   end
 end
 
+If your database does not support native array types you can use ActiveRecords
+ability to serialize the locales array
+
+class MyModel < ActiveRecord::Base
+  serialize :locales
+  translate :name
+end
+
+And add the column as a string
+
+class CreateMyModel < ActiveRecord::Migration
+  def change
+    create_table :my_model do |t|
+      t.string :locales
+    end
+  end
+end
+
 == How it works
 
 Translateable saves the translation via I18n.backend.store_translations, this
