@@ -5,6 +5,7 @@ translations in the provided I18n backend.  This is really helpful if there
 already is, a interface to provide ie missing translations for elements in I18n.
 
 == Usage
+Use inside of the model
 
 class MyModel < ActiveRecord::Base
   translate :title

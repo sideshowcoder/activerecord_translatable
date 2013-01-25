@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "ActiveRecordTranslateable" do
 
     it "should add name to translateable" do
-      Something.translateable.should include(:name)
+      Something.translatable.should include(:name)
     end
 
     context "class without translations" do
@@ -16,6 +16,7 @@ describe "ActiveRecordTranslateable" do
         Foo.find(foo.id).should_not be_nil
       end
     end
+
 
     context "translations" do
       before(:each) do
@@ -83,7 +84,7 @@ describe "ActiveRecordTranslateable" do
 
     end
 
-    context "locales" do
+    context "locales with db array support" do
       let(:something) { Something.create!(name: "Something") }
 
       it "should respond with available locales" do
@@ -92,6 +93,15 @@ describe "ActiveRecordTranslateable" do
         something.available_locales.should include(:en, :de)
       end
 
+    end
+
+    context "locales without db array support" do
+      let(:thing) { Noarraything.create!(name: "thing", name_de: "ding") }
+
+      it "should store the locales as array" do
+        locales = thing.locales
+        thing.reload.locales.should == locales
+      end
     end
 
 end
