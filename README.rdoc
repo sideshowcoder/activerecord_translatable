@@ -9,17 +9,17 @@ already is, a interface to provide ie missing translations for elements in I18n.
 == Usage
 Use inside of the model
 
-class MyModel < ActiveRecord::Base
-  translate :title
-end
+  class MyModel < ActiveRecord::Base
+    translate :title
+  end
 
-I18n.locale = :en
-mymodel = MyModel.create(title: "My title", title_de: "Mein Title)
-mymodel.title_wk = "Woohhaakkk"
+  I18n.locale = :en
+  mymodel = MyModel.create(title: "My title", title_de: "Mein Title)
+  mymodel.title_wk = "Woohhaakkk"
 
-mymodel.title # => "My title"
-mymodel.title_en # => "My title"
-mymodel.title_wk # => "Woohhaakkk"
+  mymodel.title # => "My title"
+  mymodel.title_en # => "My title"
+  mymodel.title_wk # => "Woohhaakkk"
 
 == Prerequisites
 To save the locales ActiveRecordTranslatable saves an array of the specified locale, for
@@ -30,31 +30,31 @@ gem 'activerecord-postgres-array'
 
 To add the array to the model the migration looks like this
 
-class CreateMyModel < ActiveRecord::Migration
-  def change
-    create_table :my_model do |t|
-      t.string_array :locales
+  class CreateMyModel < ActiveRecord::Migration
+    def change
+      create_table :my_model do |t|
+        t.string_array :locales
+      end
     end
   end
-end
 
 If your database does not support native array types you can use ActiveRecords
 ability to serialize the locales array
 
-class MyModel < ActiveRecord::Base
-  serialize :locales
-  translate :name
-end
+  class MyModel < ActiveRecord::Base
+    serialize :locales
+    translate :name
+  end
 
 And add the column as a string
 
-class CreateMyModel < ActiveRecord::Migration
-  def change
-    create_table :my_model do |t|
-      t.string :locales
+  class CreateMyModel < ActiveRecord::Migration
+    def change
+      create_table :my_model do |t|
+        t.string :locales
+      end
     end
   end
-end
 
 == How it works
 
