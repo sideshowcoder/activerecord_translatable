@@ -1,3 +1,5 @@
+{<img src="https://travis-ci.org/sideshowcoder/activerecord_translatable.png" />}[https://travis-ci.org/sideshowcoder/activerecord_translatable]
+
 = ActiveRecordTranslatable
 
 Make attributes of an ActiveRecord Model translatable, and store the
