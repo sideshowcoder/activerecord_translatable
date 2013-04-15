@@ -15,6 +15,9 @@ module ActiveRecordTranslatable
     locales = self.locales || []
     locales << locale.to_s
     self.locales = locales.uniq
+  end
+
+  def translations
     @translations ||= Hash.new { |h,k| h[k] = {} }
   end
 
@@ -23,25 +26,33 @@ module ActiveRecordTranslatable
   end
 
   def translation(attribute, locale = I18n.locale)
-    setup_locale(locale)
     begin
-      @translations[locale][attribute] ||= I18n.t("#{base_name}.#{attribute}-#{self.id}",
-                                                  locale: locale, raise: true)
+      translation = translations.fetch(locale).fetch(attribute)
+    rescue KeyError
+      _get_stored_translation(attribute, locale)
+    end
+  end
+
+  def _get_stored_translation(attribute, locale)
+    begin
+      translation = I18n.t("#{base_name}.#{attribute}-#{self.id}", locale: locale, raise: true)
+      setup_locale(locale)
+      translations[locale][attribute] = translation
     rescue I18n::MissingTranslationData
-      @translations[locale][attribute]
+      nil
     end
   end
 
   def set_translation(attribute, value, locale = I18n.locale)
     setup_locale(locale)
-    @translations[locale][attribute] = value
+    translations[locale][attribute] = value
   end
 
   def write_translations
-    return if @translations.nil? # there are no translations to be saved
+    return if translations.empty? # there are no translations to be saved
 
-    @translations.each do |locale, translations|
-      translations.each do |attribute, value|
+    translations.each do |locale, trans|
+      trans.each do |attribute, value|
         I18n.backend.store_translations(locale, { "#{base_name}.#{attribute}-#{self.id}" => value }, escape: false)
       end
     end
@@ -87,7 +98,7 @@ module ActiveRecordTranslatable
   module ClassMethods
     def translate(*attributes)
       self._translatable ||= Hash.new { |h,k| h[k] = [] }
-      self._translatable[base_name] = translatable.concat(attributes)
+      self._translatable[base_name] = translatable.concat(attributes).uniq
     end
 
     def translatable

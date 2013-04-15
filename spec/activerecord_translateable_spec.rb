@@ -65,6 +65,15 @@ describe "ActiveRecordTranslateable" do
 
     end
 
+    context "don't set locales on read" do
+      let(:something) { Something.create!(name: "Something") }
+
+      it "should not include a read locale unless set to something" do
+        something.name_gr
+        something.locales.should_not include("gr")
+      end
+    end
+
     context "custom created methods" do
       let(:something) { Something.create!(name: "Something") }
 
