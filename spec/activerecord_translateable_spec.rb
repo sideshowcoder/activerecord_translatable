@@ -65,6 +65,28 @@ describe "ActiveRecordTranslateable" do
 
     end
 
+    context "trigger save on model change" do
+      before(:each) do
+        @backend = double("Backend")
+        I18n.stub(:backend).and_return(@backend)
+      end
+      it "should save translations on save" do
+        @backend.should_receive(:store_translations).twice
+        Something.new(name: 'something', name_de: 'etwas').save
+      end
+
+      it "should save translations on create" do
+        @backend.should_receive(:store_translations).twice
+        Something.create(name: 'something', name_de: 'etwas')
+      end
+
+      it "should save translations on update" do
+        @backend.should_receive(:store_translations).exactly(4)
+        sth = Something.create(name: 'something_old', name_de: 'etwas_old')
+        sth.update_attributes(name: 'something', name_de: 'etwas')
+      end
+    end
+
     context "don't set locales on read" do
       let(:something) { Something.create!(name: "Something") }
 
