@@ -11,6 +11,61 @@ module ActiveRecordTranslatable
     self.locales.map { |locale| locale.to_sym }
   end
 
+  def method_missing(method_name, *arguments, &block)
+    translatable.each do |attribute|
+      attribute = attribute.to_s
+      if method_name.to_s =~ /^#{attribute}_(.{2})=$/
+        return set_translation(attribute, arguments.first, $1.to_sym)
+      elsif method_name.to_s =~ /^#{attribute}=$/
+        return set_translation(attribute, arguments.first)
+      elsif method_name.to_s =~ /^#{attribute}_(.{2})$/
+        return translation(attribute, $1.to_sym)
+      elsif method_name.to_s =~ /^#{attribute}$/
+        return translation(attribute)
+      end
+    end
+    super
+  end
+
+  def respond_to_missing?(method_name, include_private = false)
+    translatable.each do |attribute|
+      attribute = attribute.to_s
+      if method_name.to_s =~ /^#{attribute}_(.{2})=$/
+        return true
+      elsif method_name.to_s =~ /^#{attribute}=$/
+        return true
+      elsif method_name.to_s =~ /^#{attribute}_(.{2})$/
+        return true
+      elsif method_name.to_s =~ /^#{attribute}$/
+        return true
+      end
+    end
+    false
+  end
+
+
+  included do
+    after_save :write_translations
+    cattr_accessor :_translatable
+  end
+
+  module ClassMethods
+    def translate(*attributes)
+      self._translatable ||= Hash.new { |h,k| h[k] = [] }
+      self._translatable[base_name] = translatable.concat(attributes).uniq
+    end
+
+    def translatable
+      self._translatable[base_name] ||= []
+    end
+
+    private
+    def base_name
+      self.name.downcase
+    end
+  end
+
+  private
   def setup_locale(locale)
     locales = self.locales || []
     locales << locale.to_s
@@ -55,59 +110,6 @@ module ActiveRecordTranslatable
       trans.each do |attribute, value|
         I18n.backend.store_translations(locale, { "#{base_name}.#{attribute}-#{self.id}" => value }, escape: false)
       end
-    end
-  end
-
-  def method_missing(method_name, *arguments, &block)
-    translatable.each do |attribute|
-      attribute = attribute.to_s
-      if method_name.to_s =~ /^#{attribute}_(.{2})=$/
-        return set_translation(attribute, arguments.first, $1.to_sym)
-      elsif method_name.to_s =~ /^#{attribute}=$/
-        return set_translation(attribute, arguments.first)
-      elsif method_name.to_s =~ /^#{attribute}_(.{2})$/
-        return translation(attribute, $1.to_sym)
-      elsif method_name.to_s =~ /^#{attribute}$/
-        return translation(attribute)
-      end
-    end
-    super
-  end
-
-  def respond_to_missing?(method_name, include_private = false)
-    translatable.each do |attribute|
-      attribute = attribute.to_s
-      if method_name.to_s =~ /^#{attribute}_(.{2})=$/
-        return true
-      elsif method_name.to_s =~ /^#{attribute}=$/
-        return true
-      elsif method_name.to_s =~ /^#{attribute}_(.{2})$/
-        return true
-      elsif method_name.to_s =~ /^#{attribute}$/
-        return true
-      end
-    end
-    false
-  end
-
-  included do
-    after_save :write_translations
-    cattr_accessor :_translatable
-  end
-
-  module ClassMethods
-    def translate(*attributes)
-      self._translatable ||= Hash.new { |h,k| h[k] = [] }
-      self._translatable[base_name] = translatable.concat(attributes).uniq
-    end
-
-    def translatable
-      self._translatable[base_name] ||= []
-    end
-
-    private
-    def base_name
-      self.name.downcase
     end
   end
 
