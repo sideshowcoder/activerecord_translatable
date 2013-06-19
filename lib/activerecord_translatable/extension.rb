@@ -1,13 +1,46 @@
 module ActiveRecordTranslatable
+  # = Add tranlatable attributes to ActiveRecord models
+  #
+  # ActiveRecordTranslatable add +translate+ method to ActiveRecord::Base
+  # which is used to declare attributes as translatable
+  #
+  # Saving and loading translations works by using +<attribute>_<local>+ to
+  # read and write the attribute
+  #
+  #   class Thing
+  #     translate :name
+  #   end
+  #
+  #   @thing = Thing.new(name: 'Thing', name_de: 'Ding')
+  #   @thing.name # => Thing
+  #   @thing.name_de # => Ding
+  #
+  # It works in conjunction with I18n.local
+  #
+  #   I18n.locale = :de
+  #   @thing.name # => Ding
+  #
+  # Translations are stored the setup I18n.backend
+
   extend ActiveSupport::Concern
+
+  ##
+  # Translatable attributes for this model
 
   def translatable
     self._translatable[base_name]
   end
 
+  ##
+  # Locales available for this model
+  # a locale is available if at least one attribute is present in given locale
+
   def available_locales
     self.locales.map { |locale| locale.to_sym }
   end
+
+  ##
+  # Define accessores
 
   def method_missing(method_name, *arguments, &block)
     translatable.each do |attribute|
@@ -48,10 +81,20 @@ module ActiveRecordTranslatable
   end
 
   module ClassMethods
+    ##
+    # Define attribute as translatable
+    #
+    #   class Thing < ActiveRecord::Base
+    #     translate :name
+    #   end
+
     def translate(*attributes)
       self._translatable ||= Hash.new { |h,k| h[k] = [] }
       self._translatable[base_name] = translatable.concat(attributes).uniq
     end
+
+    ##
+    # Attributes defined as translatable
 
     def translatable
       self._translatable[base_name] ||= []
