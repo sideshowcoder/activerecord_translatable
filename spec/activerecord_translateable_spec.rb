@@ -2,25 +2,34 @@ require 'spec_helper'
 
 describe "ActiveRecordTranslateable" do
 
-    it "should add name to translateable" do
-      Something.translatable.should include(:name)
+    it "makes name translateable" do
+      Something.class_eval { translate :foo }
+      Something.translatable.should include(:foo)
     end
 
     context "class without translations" do
-      it "should save" do
+      it "saves" do
         foo = Foo.new
         foo.save.should be_true
       end
-      it "should load" do
+      it "loads" do
         foo = Foo.create!
         Foo.find(foo.id).should_not be_nil
       end
     end
 
+    context "custom created methods" do
+      it "responds to translated attributes" do
+        something = Something.new
+        something.should respond_to(:name)
+        something.should respond_to(:name=)
+        something.should respond_to(:name_de)
+        something.should respond_to(:name_de=)
+      end
+    end
 
-    context "translations" do
+    context "attributes" do
       before(:each) do
-        @something = Something.create!(name: "Something")
         @locale = I18n.locale
       end
 
@@ -28,34 +37,44 @@ describe "ActiveRecordTranslateable" do
         I18n.locale = @locale
       end
 
-      it "should get the translation from stored translations" do
-        @something.set_translation("name", "Etwas", :de)
-        @something.translations[:de]["name"].should == "Etwas"
+      it "read/writes by hash assignment" do
+        something = Something.new(name: "Something", name_de: "Etwas")
+        something.name.should == "Something"
+        something.name_de.should == "Etwas"
       end
 
-      it "should set the translation to the stored translations" do
-        @something.set_translation("name", "Etwas", :de)
-        @something.translation("name", :de).should == "Etwas"
+      it "read/writes from database" do
+        something = Something.create!(name: "Something", name_de: "Etwas")
+        something.reload
+        something.name.should == "Something"
+        something.name_de.should == "Etwas"
       end
 
-      it "should get the translation for the default I18n locale" do
+      it "reads by locale" do
+        something = Something.create!(name_de: "Etwas")
         I18n.locale = :de
-        @something.set_translation("name", "Etwas")
-        @something.translation("name").should == "Etwas"
+        something.name.should == "Etwas"
       end
 
-      it "should set the translation for the default I18n locale" do
+      it "writes by locale" do
         I18n.locale = :de
-        @something.set_translation("name", "Etwas")
-        @something.translation("name", :de).should == "Etwas"
+        something = Something.create!(name: "Etwas", name_en: "Something")
+        I18n.locale = :en
+        something.name_de.should == "Etwas"
+        something.name.should == "Something"
       end
+    end
 
-      it "should write the stored translations to the backend" do
+    context "store translations" do
+      let(:something) { Something.create(name: "Something") }
+
+      it "writes stored translations to the backend" do
+        i18n_key = "something.name-#{something.id}"
         backend = double("Backend")
         I18n.stub(:backend).and_return(backend)
-        backend.should_receive(:store_translations).
-          with(:en, { "something.name-#{@something.id}" => "Something" }, escape: false)
-        @something.write_translations
+        backend.should_receive(:store_translations)
+               .with(:en, { i18n_key => "Something" }, escape: false)
+        something.save
       end
 
       it "should save the model without translations" do
@@ -63,76 +82,43 @@ describe "ActiveRecordTranslateable" do
         something.save.should be_true
       end
 
-    end
-
-    context "trigger save on model change" do
-      before(:each) do
-        @backend = double("Backend")
-        I18n.stub(:backend).and_return(@backend)
-      end
-      it "should save translations on save" do
-        @backend.should_receive(:store_translations).twice
-        Something.new(name: 'something', name_de: 'etwas').save
-      end
-
-      it "should save translations on create" do
-        @backend.should_receive(:store_translations).twice
-        Something.create(name: 'something', name_de: 'etwas')
-      end
-
-      it "should save translations on update" do
-        @backend.should_receive(:store_translations).exactly(4)
-        sth = Something.create(name: 'something_old', name_de: 'etwas_old')
-        sth.update_attributes(name: 'something', name_de: 'etwas')
-      end
-    end
-
-    context "don't set locales on read" do
-      let(:something) { Something.create!(name: "Something") }
-
       it "should not include a read locale unless set to something" do
         something.name_gr
         something.locales.should_not include("gr")
       end
     end
 
-    context "custom created methods" do
-      let(:something) { Something.create!(name: "Something") }
-
-      it "should respond to translated attributes" do
-        something.should respond_to(:name)
-        something.should respond_to(:name=)
-        something.should respond_to(:name_de)
-        something.should respond_to(:name_de=)
+    context "translation store" do
+      before(:each) do
+        @backend = double("Backend")
+        I18n.stub(:backend).and_return(@backend)
+      end
+      it "is called on save" do
+        @backend.should_receive(:store_translations).twice
+        Something.new(name: 'something', name_de: 'etwas').save
       end
 
-      it "should get the translated attributes" do
+      it "is called on create" do
+        @backend.should_receive(:store_translations).twice
+        Something.create(name: 'something', name_de: 'etwas')
+      end
+
+      it "is called on update" do
+        @backend.should_receive(:store_translations).exactly(4)
+        sth = Something.create(name: 'something_old', name_de: 'etwas_old')
+        sth.update_attributes(name: 'something', name_de: 'etwas')
+      end
+    end
+
+    context "db array support" do
+      it "works with native support" do
         something = Something.create!(name: "Something", name_de: "Etwas")
-        something_from_db = Something.find(something.id)
-        something_from_db.name.should == "Something"
-        something_from_db.name_de.should == "Etwas"
+        something.reload.available_locales.should include(:en, :de)
       end
 
-    end
-
-    context "locales with db array support" do
-      let(:something) { Something.create!(name: "Something") }
-
-      it "should respond with available locales" do
-        something.available_locales.should include(:en)
-        something.name_de = "Etwas"
-        something.available_locales.should include(:en, :de)
-      end
-
-    end
-
-    context "locales without db array support" do
-      let(:thing) { Noarraything.create!(name: "thing", name_de: "ding") }
-
-      it "should store the locales as array" do
-        locales = thing.locales
-        thing.reload.locales.should == locales
+      it "works with serialize" do
+        thing = Noarraything.create!(name: "thing", name_de: "ding")
+        thing.reload.available_locales.should include(:en, :de)
       end
     end
-
 end
