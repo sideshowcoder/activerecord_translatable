@@ -1,8 +1,6 @@
 module ActiveRecordTranslatable
   extend ActiveSupport::Concern
 
-  attr_accessor :translations
-
   def translatable
     self._translatable[base_name]
   end
