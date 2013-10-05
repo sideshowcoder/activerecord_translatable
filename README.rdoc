@@ -76,6 +76,12 @@ a setup postgres user with the needed rights.
   Shall the new role be allowed to create databases? (y/n) y
   Shall the new role be allowed to create more new roles? (y/n) n
 
+Move the the database.yml into place and edit to your needs
+
+  $ cp spec/dummy/config/database.yml.sample spec/dummy/config/database.yml
+  $ vim spec/dummy/config/database.yml
+  ...
+
 Afterwards the db needs to be setup
 
   $ cd spec/dummy

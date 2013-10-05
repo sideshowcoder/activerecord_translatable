@@ -15,7 +15,7 @@ test:
   encoding: unicode
   database: translatable_test
   pool: 5
-  username: postgres
+  username: translatable
   password:
   host: localhost
 
