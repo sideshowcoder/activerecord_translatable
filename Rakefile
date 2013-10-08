@@ -57,6 +57,9 @@ namespace :setup do
     config_template = "#{config}.sample"
     move_database_config_into_place config, config_template
   end
+
+  desc "Setup the test database"
+  task :test_database => ["db:create", "db:migrate", "db:test:prepare"]
 end
 
 namespace :travis do
