@@ -58,20 +58,19 @@ namespace :setup do
     move_database_config_into_place config, config_template
   end
 
-  desc "Setup the test database"
-  task :test_database => ["db:create", "db:migrate", "db:test:prepare"]
-end
-
-namespace :travis do
-  desc "Move database.yml into place"
-  task :database_config do
+  desc "Move database.yml into place on travis-ci"
+  task :travis_database_config do
     config = "#{DUMMY_PATH}/config/database.yml"
     config_template = "#{config}.travis"
     move_database_config_into_place config, config_template
   end
-end
 
-# TODO document setup with rake tasks
+  desc "Setup the test database"
+  task :test_database => ["db:create", "db:migrate", "db:test:prepare"]
+
+  desc "Setup everything for test run on travis"
+  task :travis => ["setup:travis_database_config", "setup:test_database"]
+end
 
 desc "Run the unit specs"
 task :spec => ['spec:unit']
