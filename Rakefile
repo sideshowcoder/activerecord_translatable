@@ -25,6 +25,9 @@ end
 
 Bundler::GemHelper.install_tasks
 
+# get access to db:create, db:migrate, in dummy app
+load "#{DUMMY_PATH}/Rakefile"
+
 desc 'Default: run the specs'
 task :default => 'spec:unit'
 
@@ -35,12 +38,9 @@ namespace :spec do
   end
 end
 
-namespace :setup do
-  desc "Move database.yml into place"
-  task :database_config do
-    config = "#{DUMMY_PATH}/config/database.yml"
-    unless File.exists? config
-      cp "#{config}.sample", config
+def move_database_config_into_place target, template
+    unless File.exists? target
+      cp template, target
       puts "database configuration is in place, please edit ./spec/dumm/config/database.yml according to your needs"
     else
       puts "database configuration is already present, please edit ./spec/dumm/config/database.yml according to your needs"
@@ -48,7 +48,24 @@ namespace :setup do
   end
 end
 
-load "#{DUMMY_PATH}/Rakefile" # get access to db:create, db:migrate, etc.
+namespace :setup do
+  desc "Move database.yml into place"
+  task :database_config do
+    config = "#{DUMMY_PATH}/config/database.yml"
+    config_template = "#{config}.sample"
+    move_database_config_into_place config, config_template
+  end
+end
+
+namespace :travis do
+  desc "Move database.yml into place"
+  task :database_config do
+    config = "#{DUMMY_PATH}/config/database.yml"
+    config_template = "#{config}.travis"
+    move_database_config_into_place confi, config_template
+  end
+end
+
 
 # TODO document setup with rake tasks
 
