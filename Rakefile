@@ -15,6 +15,8 @@ rescue LoadError
   RDoc::Task = Rake::RDocTask
 end
 
+require "rake/clean"
+
 RDoc::Task.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title    = 'Translatable'
@@ -39,14 +41,14 @@ namespace :spec do
 end
 
 def move_database_config_into_place target, template
-    unless File.exists? target
-      cp template, target
-      puts "database configuration is in place, please edit ./spec/dumm/config/database.yml according to your needs"
-    else
-      puts "database configuration is already present, please edit ./spec/dumm/config/database.yml according to your needs"
-    end
+  unless File.exists? target
+    cp template, target
+    puts "database configuration is in place, please edit ./spec/dumm/config/database.yml according to your needs"
+  else
+    puts "database configuration is already present, please edit ./spec/dumm/config/database.yml according to your needs"
   end
 end
+CLOBBER.include "#{DUMMY_PATH}/config/database.yml"
 
 namespace :setup do
   desc "Move database.yml into place"
@@ -62,10 +64,9 @@ namespace :travis do
   task :database_config do
     config = "#{DUMMY_PATH}/config/database.yml"
     config_template = "#{config}.travis"
-    move_database_config_into_place confi, config_template
+    move_database_config_into_place config, config_template
   end
 end
-
 
 # TODO document setup with rake tasks
 
