@@ -1,4 +1,6 @@
 #!/usr/bin/env rake
+DUMMY_PATH = "./spec/dummy"
+
 begin
   require 'bundler/setup'
 rescue LoadError
@@ -36,7 +38,7 @@ end
 namespace :setup do
   desc "Move database.yml into place"
   task :database_config do
-    config = "./spec/dummy/config/database.yml"
+    config = "#{DUMMY_PATH}/config/database.yml"
     unless File.exists? config
       cp "#{config}.sample", config
       puts "database configuration is in place, please edit ./spec/dumm/config/database.yml according to your needs"
@@ -45,6 +47,10 @@ namespace :setup do
     end
   end
 end
+
+load "#{DUMMY_PATH}/Rakefile" # get access to db:create, db:migrate, etc.
+
+# TODO document setup with rake tasks
 
 desc "Run the unit specs"
 task :spec => ['spec:unit']
