@@ -7,7 +7,7 @@ module ActiveRecordTranslatable
   # Saving and loading translations works by using +<attribute>_<local>+ to
   # read and write the attribute
   #
-  #   class Thing
+  #   class Thing < ActiveRecord::Base
   #     translate :name
   #   end
   #
