@@ -6,7 +6,16 @@ Make attributes of an ActiveRecord Model translatable, and store the
 translations in the provided I18n backend.  This is really helpful if there
 already is, a interface to provide ie missing translations for elements in I18n.
 
+== Install
+
+Add
+
+  gem "activerecord_translatable"
+
+to your gemfile, this should work for rails 3 and above.
+
 == Usage
+
 Use inside of the model
 
   class MyModel < ActiveRecord::Base
@@ -22,24 +31,10 @@ Use inside of the model
   mymodel.title_wk # => "Woohhaakkk"
 
 == Prerequisites
+
 To save the locales ActiveRecordTranslatable saves an array of the specified locale, for
-this to work, the database needs the ability to save arrays. The easiest way to
-handle this in postgres is via the postgres array
-
-gem 'activerecord-postgres-array'
-
-To add the array to the model the migration looks like this
-
-  class CreateMyModel < ActiveRecord::Migration
-    def change
-      create_table :my_model do |t|
-        t.string_array :locales
-      end
-    end
-  end
-
-If your database does not support native array types you can use ActiveRecords
-ability to serialize the locales array
+this to work, the database needs the ability to save arrays.  The easiest way to
+handle this is to use ActiveRecords ability to serialize.
 
   class MyModel < ActiveRecord::Base
     serialize :locales
@@ -56,6 +51,27 @@ And add the column as a string
     end
   end
 
+If you are using postgres you can also use the native postgres array
+
+  gem 'activerecord-postgres-array'
+
+To add the array to the model the migration looks like this
+
+  class CreateMyModel < ActiveRecord::Migration
+    def change
+      create_table :my_model do |t|
+        t.string_array :locales
+      end
+    end
+  end
+
+And the model does not need to know anything about this
+
+  class MyModel < ActiveRecord::Base
+    translate :name
+  end
+
+
 == How it works
 
 Translateable saves the translation via I18n.backend.store_translations, this
@@ -63,30 +79,14 @@ means that the backend has to be able to store new items. So backend needs to
 be for example the KeyValue or ActiveRecord one.
 More http://railscasts.com/episodes/256-i18n-backends
 
-== Miscellaneous
+== Tests
 
-=== Tests
-The tests are using rspec, and there is a dummy app setup in the spec directory.
-Since the example is using postgres, to get the tests working there needs to be
-a setup postgres user with the needed rights.
-
-  $ createuser -h localhost
-  Enter name of role to add: translatable
-  Shall the new role be a superuser? (y/n) n
-  Shall the new role be allowed to create databases? (y/n) y
-  Shall the new role be allowed to create more new roles? (y/n) n
-
-Move the the database.yml into place and edit to your needs, and setup the test
-database
-
-  $ rake setup:database_config
-  $ rake setup:test_database
-
-Now the test can be run via
+The tests are using rspec and an im memory sqlite database, so all that is needed is to run
 
   $ rake spec
 
-=== Current State
-The gem is still in early development and has just been extracted from a
-project. So any bug reports and contributions are highly welcome.
+== Current State
+
+This has been extracted form an Rails application so it should be pretty stable
+by now. Any contributions and fixes are of course highly welcome!
 
