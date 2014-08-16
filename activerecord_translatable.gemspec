@@ -15,9 +15,10 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
-  s.add_dependency "rails", "~> 3.2.13"
+  s.add_dependency "activerecord", ">= 3.0"
+  s.add_dependency "activesupport", ">= 3.0"
 
-  s.add_development_dependency "pg"
-  s.add_development_dependency "activerecord-postgres-array"
-  s.add_development_dependency "rspec-rails"
+  s.add_development_dependency "rspec", "~> 2.0"
+  s.add_development_dependency "rake"
+  s.add_development_dependency "sqlite3"
 end

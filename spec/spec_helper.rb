@@ -1,15 +1,11 @@
-# Configure Rails Environment
-ENV["RAILS_ENV"] = "test"
+$:.unshift "#{File.dirname(__FILE__)}/lib"
 
-require File.expand_path("../dummy/config/environment.rb",  __FILE__)
-require 'rspec/rails'
+require "sqlite3"
+require "active_record"
+require "activerecord_translatable"
 
-Rails.backtrace_cleaner.remove_silencers!
-
-# Load support files
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
+I18n.enforce_available_locales = false
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
-  config.use_transactional_fixtures = true
 end

@@ -1,6 +1,27 @@
 require 'spec_helper'
 
+ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
+ActiveRecord::Schema.verbose = false
+
+def setup_db
+  ActiveRecord::Base.connection.create_table :somethings do |t|
+    t.string :locales
+  end
+
+  ActiveRecord::Base.connection.create_table :foos do |t|
+  end
+end
+
+class Something < ActiveRecord::Base
+  serialize :locales
+  translate :name
+end
+
+class Foo < ActiveRecord::Base
+end
+
 describe "ActiveRecordTranslateable" do
+  before(:all) { setup_db }
 
   it "makes name translateable" do
     Something.class_eval { translate :foo }
@@ -107,18 +128,6 @@ describe "ActiveRecordTranslateable" do
       @backend.should_receive(:store_translations).exactly(4)
       sth = Something.create(name: 'something_old', name_de: 'etwas_old')
       sth.update_attributes(name: 'something', name_de: 'etwas')
-    end
-  end
-
-  context "db array support" do
-    it "works with native support" do
-      something = Something.create!(name: "Something", name_de: "Etwas")
-      something.reload.available_locales.should include(:en, :de)
-    end
-
-    it "works with serialize" do
-      thing = Noarraything.create!(name: "thing", name_de: "ding")
-      thing.reload.available_locales.should include(:en, :de)
     end
   end
 end
